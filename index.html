@@ -7,9 +7,24 @@
 </head>
 <body>
     <style>
-        body { background-color: #1E1E1E; }
+        body {
+            background-color: #1E1E1E;
+            display: flex;
+        }
+        #level:focus {
+            outline: none;
+        }
+        #level {
+            background-color: transparent;
+            border: solid 1px #282828;
+            color: #FFFFFF;
+            height: 1.5em;
+            padding: 0 0.5em;
+            margin-left: 0.5em;
+        }
     </style>
     <canvas id="canvas" width="800" height="800"></canvas>
+    <input id="level" type="number" value="6">
     <script src="main.js"></script>
 </body>
 </html>

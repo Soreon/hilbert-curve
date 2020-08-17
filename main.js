@@ -1,10 +1,9 @@
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
         function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
         function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
@@ -35,13 +34,20 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
+var _this = this;
 var canvas = document.getElementById('canvas');
 var context = canvas.getContext('2d');
+var levelInput = document.getElementById('level');
 var canvasSize = 800;
-var level = 7;
-var subdivisionSize = canvasSize / (Math.pow(2, level));
-var count = 0;
 var points = [];
+var level = 6;
+var getSubdivisionSize = function () { return canvasSize / (Math.pow(2, level)); };
+var count = 0;
+var draw = true;
+function clearCanvas(canvas, context) {
+    if (context === void 0) { context = canvas.getContext('2d'); }
+    context.clearRect(0, 0, canvas.width, canvas.height);
+}
 function drawLine(context, x1, y1, x2, y2, color) {
     context.beginPath();
     context.moveTo(x1, y1);
@@ -51,8 +57,8 @@ function drawLine(context, x1, y1, x2, y2, color) {
 }
 function drawGrid() {
     for (var i = 1; i < Math.pow(2, level); i++) {
-        drawLine(context, 0, subdivisionSize * i, canvasSize, subdivisionSize * i, '#282828');
-        drawLine(context, subdivisionSize * i, 0, subdivisionSize * i, canvasSize, '#282828');
+        drawLine(context, 0, getSubdivisionSize() * i, canvasSize, getSubdivisionSize() * i, '#282828');
+        drawLine(context, getSubdivisionSize() * i, 0, getSubdivisionSize() * i, canvasSize, '#282828');
     }
 }
 function perc2color(percentage, maxHue, minHue) {
@@ -122,7 +128,7 @@ function drawPattern() {
                     i = 0;
                     _a.label = 1;
                 case 1:
-                    if (!(i < points.length - 1)) return [3 /*break*/, 4];
+                    if (!(i < points.length - 1 && draw)) return [3 /*break*/, 4];
                     p1 = points[i];
                     p2 = points[i + 1];
                     context.strokeStyle = perc2color(i / points.length);
@@ -142,6 +148,26 @@ function drawPattern() {
         });
     });
 }
+levelInput.addEventListener('input', function () { return __awaiter(_this, void 0, void 0, function () {
+    return __generator(this, function (_a) {
+        switch (_a.label) {
+            case 0:
+                level = +levelInput.value;
+                console.log(level, getSubdivisionSize());
+                draw = false;
+                clearCanvas(canvas, context);
+                return [4 /*yield*/, sleep(10)];
+            case 1:
+                _a.sent();
+                draw = true;
+                points = [];
+                generatePattern(context, canvasSize / 2, canvasSize / 2);
+                drawGrid();
+                drawPattern();
+                return [2 /*return*/];
+        }
+    });
+}); });
 context.translate(0.5, 0.5);
 generatePattern(context, canvasSize / 2, canvasSize / 2);
 drawGrid();

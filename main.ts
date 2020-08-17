@@ -1,15 +1,21 @@
 const canvas: HTMLCanvasElement = <HTMLCanvasElement>document.getElementById('canvas');
 const context: CanvasRenderingContext2D = <CanvasRenderingContext2D>canvas.getContext('2d');
+const levelInput: HTMLInputElement = <HTMLInputElement>document.getElementById('level');
 
 const canvasSize: number = 800;
-const level: number = 6;
-const subdivisionSize = canvasSize / (2 ** level);
+let points: Array<Point> = [];
+let level: number = 6;
+let getSubdivisionSize = () => canvasSize / (2 ** level);
 let count = 0;
-const points: Array<Point> = [];
+let draw = true;
 
 interface Point {
     x: number,
     y: number
+}
+
+function clearCanvas(canvas: HTMLCanvasElement, context: CanvasRenderingContext2D = <CanvasRenderingContext2D>canvas.getContext('2d')) {
+    context.clearRect(0, 0, canvas.width, canvas.height);
 }
 
 function drawLine(context: CanvasRenderingContext2D, x1: number, y1: number, x2: number, y2: number, color: string) {
@@ -22,8 +28,8 @@ function drawLine(context: CanvasRenderingContext2D, x1: number, y1: number, x2:
 
 function drawGrid() {
     for (let i = 1; i < 2 ** level; i++) {
-        drawLine(context, 0, subdivisionSize * i, canvasSize, subdivisionSize * i, '#282828');
-        drawLine(context, subdivisionSize * i, 0, subdivisionSize * i, canvasSize, '#282828');
+        drawLine(context, 0, getSubdivisionSize() * i, canvasSize, getSubdivisionSize() * i, '#282828');
+        drawLine(context, getSubdivisionSize() * i, 0, getSubdivisionSize() * i, canvasSize, '#282828');
     }
 }
 
@@ -78,7 +84,7 @@ function generatePattern(context: CanvasRenderingContext2D, ox: number, oy: numb
 
 async function drawPattern() {
     context.beginPath()
-    for (let i = 0; i < points.length - 1; i++) {
+    for (let i = 0; i < points.length - 1 && draw; i++) {
         const p1 = points[i];
         const p2 = points[i + 1];
         context.strokeStyle = perc2color(i / points.length);
@@ -89,6 +95,19 @@ async function drawPattern() {
         await sleep(1);
     }
 }
+
+levelInput.addEventListener('input', async () => {
+    level = +levelInput.value;
+    console.log(level, getSubdivisionSize());
+    draw = false;
+    clearCanvas(canvas, context);
+    await sleep(10);
+    draw = true;
+    points = [];
+    generatePattern(context, canvasSize / 2, canvasSize / 2);
+    drawGrid();
+    drawPattern();
+});
 
 context.translate(0.5, 0.5);
 generatePattern(context, canvasSize / 2, canvasSize / 2);
