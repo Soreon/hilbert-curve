@@ -2,7 +2,7 @@ const canvas: HTMLCanvasElement = <HTMLCanvasElement>document.getElementById('ca
 const context: CanvasRenderingContext2D = <CanvasRenderingContext2D>canvas.getContext('2d');
 
 const canvasSize: number = 800;
-const level: number = 7;
+const level: number = 6;
 const subdivisionSize = canvasSize / (2 ** level);
 let count = 0;
 const points: Array<Point> = [];
